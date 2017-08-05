@@ -1,4 +1,4 @@
-package fpinscala
+package fpinscala.modules
 
 import scala.annotation.tailrec
 
@@ -57,4 +57,15 @@ object WarmUpModule {
   // Implement a higher-oreder function that composes two functions
   def compose[A, B, C](f: B => C, g: A => B): A => C =
     a => f(g(a))
+
+  def run: Unit = {
+    def formatResult[A, B](name: String, a: A, f: A => B): String = {
+      val msg = "The result of applying %s on %d is %d."
+      msg.format(name, a, f(a))
+    }
+
+    for(i <- 1 to 5) println(formatResult("factorial", i, factorial))
+
+    for(i <- 1 to 5) println(formatResult("fibonacci", i, fib))
+  }
 }
