@@ -1,8 +1,11 @@
 package fpinscala
 
-import modules.WarmUpModule
+import modules._
 
 object Main extends App {
   // Chapter #2
   WarmUpModule.run
+
+  // Chapter #3
+  DataStructuresModule.run
 }
