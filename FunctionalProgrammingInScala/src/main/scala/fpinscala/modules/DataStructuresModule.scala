@@ -1,5 +1,7 @@
 package fpinscala.modules
 
+import scala.collection.immutable.{List => NativeList, Nil => NativeNil}
+
 import scala.annotation.tailrec
 
 object DataStructuresModule {
@@ -136,6 +138,75 @@ object DataStructuresModule {
 
       reverse(loop(a, b, Nil: List[C]))
     }
+
+    // Exercise 3.24
+    // Implement `hasSubsequence` for checking whether a List contains
+    // another List as a subsequence
+    @tailrec
+    def hasSubsequence[A](sup: List[A], sub: List[A]): Boolean = {
+      @tailrec
+      def startsWith[A](lst: List[A], start: List[A]): Boolean = (lst, start) match {
+        case (Cons(h, t), Cons(sh, st)) if h == sh => startsWith(t, st)
+        case (_, Nil) => true
+        case _ => false
+      }
+
+      sup match {
+        case s @ Cons(_, _) if startsWith(s, sub) => true
+        case Cons(_, t) => hasSubsequence(t, sub)
+        case Nil => sub == Nil
+      }
+    }
+  }
+
+  sealed trait Tree[+A]
+
+  case class Leaf[A](value: A) extends Tree[A]
+  case class Branch[A](left: Tree[A], right: Tree[A]) extends Tree[A]
+
+  object Tree {
+    // Exercise 3.25
+    // Implement function `size` that counts the number of nodes (leaves
+    // and branches) in a Tree
+    def size[A](t: Tree[A]): Int = t match {
+      case Branch(l, r) => 1 + size(l) + size(r)
+      case Leaf(_) => 1
+    }
+
+    // Exercise 3.26
+    // Implement function `maxT` that returns max element in a Tree[Int]
+    def maxT(t: Tree[Int]): Int = t match {
+      case Branch(l, r) => maxT(l) max maxT(r)
+      case Leaf(v) => v
+    }
+
+    // Exercise 3.27
+    // Implement function `depth` that returns max path length from the
+    // root to any leaf
+    def depth[A](t: Tree[A]): Int = t match {
+      case Branch(l, r) => 1 + (depth(l) max depth(r))
+      case Leaf(_) => 0
+    }
+
+    // Exercise 3.28
+    // Implement function `map`
+    def map[A, B](t: Tree[A])(f: A => B): Tree[B] = t match {
+      case Branch(l, r) => Branch(map(l)(f), map(r)(f))
+      case Leaf(v) => Leaf(f(v))
+    }
+
+    // Exercise 3.29
+    // Generalize `size`, `maxT`, `depth` and `map`, writing a function `fold
+    // that abstracts over their similarities
+    def fold[A, B](t: Tree[A])(combine: (B, B) => B, f: A => B): B = t match {
+      case Branch(l, r) => combine(fold(l)(combine, f), fold(r)(combine, f))
+      case Leaf(v) => f(v)
+    }
+
+    def sizeFold[A](t: Tree[A]): Int = fold[A, Int](t)(1 + _ + _, _ => 1)
+    def maxFold(t: Tree[Int]): Int = fold[Int, Int](t)(_ max _, identity)
+    def depthFold[A](t: Tree[A]): Int = fold[A, Int](t)(1 + _ max _, _ => 0)
+    def mapFold[A, B](t: Tree[A])(f: A => B): Tree[B] = fold[A, Tree[B]](t)(Branch(_, _), v => Leaf(f(v)))
   }
 
   def run: Unit = {
@@ -149,5 +220,12 @@ object DataStructuresModule {
       s"${List.foldLeftViaFoldRight(lst, Nil: List[Int])((a, b) => Cons(b, a))}")
     println(s"List $lst folding via `foldRightViaFoldLeft` with Cons = " +
       s"${List.foldRightViaFoldLeft(lst, Nil: List[Int])(Cons(_, _))}")
+
+    val tree = Branch(
+      Branch(Leaf(1), Leaf(2)),
+      Branch(Leaf(3), Leaf(4))
+    )
+
+    println(s"Tree $tree after `map` with `toString` = ${Tree.mapFold(tree)(_.toString)}")
   }
 }
