@@ -1,4 +1,4 @@
-package fpinscala.modules
+package fpinscala
 
 import scala.collection.immutable.{List => NativeList, Nil => NativeNil}
 

@@ -1,4 +1,4 @@
-package fpinscala.modules
+package fpinscala
 
 import scala.{None => NativeNone, Option => NativeOption, Some => NativeSome}
 import scala.{Either => NativeEither, Left => NativeLeft, Right => NativeRight}
